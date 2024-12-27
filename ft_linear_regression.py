@@ -12,23 +12,30 @@ class   linear_regression:
 
     def __init__(self, dataset) -> None:
         self.dataset = dataset
-        with open(dataset) as csvfile:
-            rows = csv.reader(csvfile)
-            next(rows)
-            for row in rows:
-                self.mileage.append(int(row[0]))
-                self.price.append(int(row[1]))
-                self.data_len += 1
+        try:
+            with open(dataset) as csvfile:
+                rows = csv.reader(csvfile)
+                next(rows)
+                for row in rows:
+                    self.mileage.append(int(row[0]))
+                    self.price.append(int(row[1]))
+                    self.data_len += 1
+        except:
+            print ("Couldn't open", dataset)
 
     def change_thetas(self, final_theta0, final_theta1) -> None:
-        with open(__file__, 'r') as f:
-            lines = f.read().split('\n')
-            new_theta0 = 'theta0 = {}'.format(final_theta0)
-            new_theta1 = 'theta1 = {}'.format(final_theta1)
-            new_file = '\n'.join(lines[:3] + [new_theta0] + [new_theta1] + lines[5:])
+        try: 
+            with open(__file__, 'r') as f:
+                lines = f.read().split('\n')
+                new_theta0 = f'theta0 = {final_theta0}'
+                new_theta1 = f'theta1 = {final_theta1}'
+                new_file = '\n'.join(lines[:3] + [new_theta0] + [new_theta1] + lines[5:])
 
-        with open(__file__, 'w') as f:
-            f.write(new_file)
+            with open(__file__, 'w') as f:
+                f.write(new_file)
+        except:
+            print ("Couldn't open", __file__)
+
 
     def reset(self) -> None:
         self.change_thetas(0, 0)
