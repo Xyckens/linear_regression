@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import matplotlib.pyplot as plt
 
 theta0 = 0
 theta1 = 0
@@ -9,6 +10,9 @@ class   linear_regression:
     data_len = 0
     mileage = []
     price = []
+    fig, ax = plt.subplots()
+    x = np.linspace(10000, 280000, 100)
+    line, = ax.plot(x, 0 * x)
 
     def __init__(self, dataset) -> None:
         self.dataset = dataset
@@ -20,6 +24,11 @@ class   linear_regression:
                     self.mileage.append(int(row[0]))
                     self.price.append(int(row[1]))
                     self.data_len += 1
+            plt.ion() #interactive mode
+            plt.plot(self.mileage, self.price, 'r.')
+            plt.ylabel("Pricing")
+            plt.xlabel("Mileage")
+            plt.title("Price Prediction")
         except:
             print ("Couldn't open", dataset)
 
@@ -29,7 +38,7 @@ class   linear_regression:
                 lines = f.read().split('\n')
                 new_theta0 = f'theta0 = {final_theta0}'
                 new_theta1 = f'theta1 = {final_theta1}'
-                new_file = '\n'.join(lines[:3] + [new_theta0] + [new_theta1] + lines[5:])
+                new_file = '\n'.join(lines[:4] + [new_theta0] + [new_theta1] + lines[6:])
 
             with open(__file__, 'w') as f:
                 f.write(new_file)
@@ -68,7 +77,7 @@ class   linear_regression:
         delta1 = 11
         learningRate = 0.01
         iteration = 0
-        while (delta0 > 10 and delta1 > 10):
+        while (delta0 > 11 and delta1 > 11):
             new0, new1 = self.train(self.data_len, self.mileage, self.price, learningRate, theta0, theta1)
             delta0 = abs(theta0 - new0)
             delta1 = abs(theta1 - new1)
@@ -81,9 +90,21 @@ class   linear_regression:
                 print("delta got too high")
                 break
             '''
+            self.data_graph(theta0, theta1)
         #change_thetas(0, 0)
         print(self.data_len)
         print("iterations = ", iteration)
+        plt.ioff()
+        plt.show()
+
+    #bonus   
+    def data_graph(self, theta0, theta1):
+        y = self.x * theta1 + theta0
+        self.line.set_ydata(y)
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+        plt.pause(0.1)
+    
 
 if __name__ == "__main__":
     result = linear_regression("data.csv")
