@@ -11,7 +11,7 @@ class   linear_regression:
     mileage = []
     price = []
     fig, ax = plt.subplots()
-    x = np.linspace(20000 , 250000, 100)
+    x = np.linspace(-2 , 3, 100)
     line, = ax.plot(x, 0 * x)
 
     def __init__(self, dataset) -> None:
@@ -24,11 +24,15 @@ class   linear_regression:
                     self.mileage.append(int(row[0]))
                     self.price.append(int(row[1]))
                     self.data_len += 1
+            self.mileage = (self.mileage - np.mean(self.mileage)) / np.std(self.mileage)
+            self.price = (self.price - np.mean(self.price)) / np.std(self.price)
             plt.ion() #interactive mode
             plt.plot(self.mileage, self.price, 'r.')
             plt.ylabel("Pricing")
             plt.xlabel("Mileage")
             plt.title("Price Prediction")
+            plt.legend(["My LR", "Real Points", "Numpy LR"])
+
         except:
             print ("Couldn't open", dataset)
 
@@ -57,17 +61,17 @@ class   linear_regression:
     def estimate(self, theta0, theta1, mileage) -> float:
         return theta0 + theta1 * mileage
 
-    def train(self, data_len, mileage, price, learningRate, theta0, theta1) -> tuple[float, float]:
+    def train(self, learningRate, theta0, theta1) -> tuple[float, float]:
         i = 0
         sum0 = 0
         sum1 = 0
-        while (i < data_len - 1):
-            est = self.estimate(theta0, theta1, mileage[i]) - price[i]
+        while (i <= self.data_len - 1):
+            est = self.estimate(theta0, theta1, self.mileage[i]/100000) - self.price[i] / 1000
             #print(f"est =  {est:.2e}")
             sum0 += est
-            sum1 += est * mileage[i]
+            sum1 += est * self.mileage[i]
             i += 1
-        const = learningRate / data_len
+        const = learningRate / self.data_len
         return const * sum0, const * sum1
 
     def find_learning_rate(self) -> None:
@@ -77,35 +81,42 @@ class   linear_regression:
         delta1 = 11
         learningRate = 0.01
         iteration = 0
-        '''while (delta0 > 10 and delta1 > 10):
-            new0, new1 = self.train(self.data_len, self.mileage, self.price, learningRate, theta0, theta1)
+        while (iteration < 30):
+            new0, new1 = self.train(learningRate, theta0, theta1)
             delta0 = abs(theta0 - new0)
             delta1 = abs(theta1 - new1)
-            print(f"new0 {new0:.03e} and new1 {new1:.03e}")
+            print(f"new0 {new0:.03e} and new1 {new1:.03e} delta0 {delta0:.03e} delta1 {delta1:.03e}")
             theta0 = new0
             theta1 = new1
             iteration += 1
+            '''
             if (delta0 > 1000000000 or delta1 > 1000000000):
                 print("delta got too high")
                 break
+            '''
             self.data_graph(theta0, theta1)
-        '''
         m,b = np.polyfit(np.array(self.mileage), np.array(self.price), 1)
         print(m, b)
-        self.data_graph(b, m)
+        plt.plot(self.x, b + m * self.x, "g")
         print("iterations = ", iteration)
         plt.ioff()
         plt.show()
 
     #bonus   
-    def data_graph(self, theta0, theta1):
-        print(theta0, theta1)
+    def data_graph(self, theta0, theta1) -> None:
         y = theta0 + self.x * theta1
-        print(self.x, y)
         self.line.set_ydata(y)
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
         plt.pause(0.1)
+
+    def precision(self,theta0, theta1) -> float: #mean absolute error
+        i = 0
+        est = 0
+        while (i <= self.data_len - 1):
+            est += abs(self.estimate(theta0, theta1, self.mileage[i]) - self.price[i])
+            i += 1
+        return est / self.data_len
     
 
 if __name__ == "__main__":
