@@ -11,7 +11,7 @@ class   linear_regression:
     mileage = []
     price = []
     fig, ax = plt.subplots()
-    x = np.linspace(10000, 280000, 100)
+    x = np.linspace(20000 , 250000, 100)
     line, = ax.plot(x, 0 * x)
 
     def __init__(self, dataset) -> None:
@@ -61,11 +61,11 @@ class   linear_regression:
         i = 0
         sum0 = 0
         sum1 = 0
-        while (i <= data_len - 1):
+        while (i < data_len - 1):
             est = self.estimate(theta0, theta1, mileage[i]) - price[i]
             #print(f"est =  {est:.2e}")
-            sum0 += est * learningRate / data_len
-            sum1 += est * mileage[i] * learningRate / data_len
+            sum0 += est
+            sum1 += est * mileage[i]
             i += 1
         const = learningRate / data_len
         return const * sum0, const * sum1
@@ -77,29 +77,31 @@ class   linear_regression:
         delta1 = 11
         learningRate = 0.01
         iteration = 0
-        while (delta0 > 11 and delta1 > 11):
+        '''while (delta0 > 10 and delta1 > 10):
             new0, new1 = self.train(self.data_len, self.mileage, self.price, learningRate, theta0, theta1)
             delta0 = abs(theta0 - new0)
             delta1 = abs(theta1 - new1)
+            print(f"new0 {new0:.03e} and new1 {new1:.03e}")
             theta0 = new0
             theta1 = new1
-            print(f"delta0 {delta0:.3e}, delta1 {delta1:.3e}, theta0 {theta0:.03e} and theta1 {theta1:.03e}")
             iteration += 1
-            '''
             if (delta0 > 1000000000 or delta1 > 1000000000):
                 print("delta got too high")
                 break
-            '''
             self.data_graph(theta0, theta1)
-        #change_thetas(0, 0)
-        print(self.data_len)
+        '''
+        m,b = np.polyfit(np.array(self.mileage), np.array(self.price), 1)
+        print(m, b)
+        self.data_graph(b, m)
         print("iterations = ", iteration)
         plt.ioff()
         plt.show()
 
     #bonus   
     def data_graph(self, theta0, theta1):
-        y = self.x * theta1 + theta0
+        print(theta0, theta1)
+        y = theta0 + self.x * theta1
+        print(self.x, y)
         self.line.set_ydata(y)
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
