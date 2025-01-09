@@ -2,9 +2,6 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-theta0 = 0
-theta1 = 0
-
 class   linear_regression:
 
     data_len = 0
@@ -27,7 +24,7 @@ class   linear_regression:
                     self.price.append(int(row[1]))
                     self.data_len += 1
             self.mileage = (self.mileage - np.mean(self.mileage)) / np.std(self.mileage)
-            #self.price = (self.price - np.mean(self.price)) / np.std(self.price)
+            self.price = (self.price - np.mean(self.price)) / np.std(self.price)
             plt.ion() #interactive mode
             plt.plot(self.mileage, self.price, 'r.')
             plt.ylabel("Pricing")
@@ -42,15 +39,28 @@ class   linear_regression:
         try: 
             with open(__file__, 'r') as f:
                 lines = f.read().split('\n')
-                new_theta0 = f'theta0 = {final_theta0}'
-                new_theta1 = f'theta1 = {final_theta1}'
-                new_file = '\n'.join(lines[:4] + [new_theta0] + [new_theta1] + lines[6:])
+                new_theta0 = f'    theta0 = {final_theta0}'
+                new_theta1 = f'    theta1 = {final_theta1}'
+                new_file = '\n'.join(lines[:12] + [new_theta0] + [new_theta1] + lines[14:])
 
             with open(__file__, 'w') as f:
                 f.write(new_file)
         except:
             print ("Couldn't open", __file__)
 
+    def get_thetas(self) -> tuple[float, float]:
+            try: 
+                with open(__file__, 'r') as f:
+                    lines = f.read().split('\n')
+                    theta0_line = lines[4].split(' ')
+                    theta1_line = lines[5].split(' ')
+                if (len(theta0_line) == 3 and len(theta0_line) == 3):
+                    return (float(theta0_line[2]), float(theta1_line[2]))
+                else:
+                    print ("Thetas wrong format")
+
+            except:
+                print ("Couldn't open", __file__)
 
     def reset(self) -> None:
         self.change_thetas(0, 0)
@@ -62,6 +72,12 @@ class   linear_regression:
 
     def estimate(self, b, m, x) -> float:
         return b + m * x
+    
+    def predict(self, mileage) -> float:
+        if (isinstance(self.theta0, float) and isinstance(self.theta1, float) and isinstance(mileage, float)):
+            return self.theta0 + self.theta1 * mileage
+        else:
+            print("Wrong values!")
 
     def train(self, learningRate) -> tuple[float, float]:
         i = 0
